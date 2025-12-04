@@ -1,0 +1,887 @@
+import { cn } from "@/lib/utils";
+import { ReactNode } from "react";
+
+interface GlassCardProps {
+  children: ReactNode;
+  className?: string;
+}
+
+export function GlassCard({ children, className }: GlassCardProps) {
+  return (
+    <div className={cn("glass rounded-2xl p-4", className)}>
+      {children}
+    </div>
+  );
+}
+import { cn } from "@/lib/utils";
+import { Home, Plus, Palette, History } from "lucide-react";
+import { Link, useLocation } from "react-router-dom";
+
+const navItems = [
+  { icon: Home, label: "Home", path: "/" },
+  { icon: Plus, label: "Create", path: "/create" },
+  { icon: Palette, label: "Design", path: "/design" },
+  { icon: History, label: "History", path: "/history" },
+];
+
+export function Navigation() {
+  const location = useLocation();
+
+  return (
+    <nav className="fixed bottom-0 left-0 right-0 glass border-t border-border/50 px-4 py-3 z-50">
+      <div className="flex justify-around items-center max-w-md mx-auto">
+        {navItems.map(({ icon: Icon, label, path }) => {
+          const isActive = location.pathname === path;
+          return (
+            <Link
+              key={path}
+              to={path}
+              className={cn(
+                "flex flex-col items-center gap-1 px-4 py-2 rounded-xl transition-all duration-300",
+                isActive 
+                  ? "text-primary glow-text-primary" 
+                  : "text-muted-foreground hover:text-foreground"
+              )}
+            >
+              <Icon className={cn("w-5 h-5", isActive && "drop-shadow-[0_0_8px_hsl(var(--primary))]")} />
+              <span className="text-xs font-medium">{label}</span>
+            </Link>
+          );
+        })}
+      </div>
+    </nav>
+  );
+}
+import { cn } from "@/lib/utils";
+
+interface PlanetProps {
+  size?: "sm" | "md" | "lg" | "xl";
+  color?: "orange" | "teal" | "purple" | "blue";
+  className?: string;
+  hasRings?: boolean;
+  animated?: boolean;
+}
+
+const sizeClasses = {
+  sm: "w-8 h-8",
+  md: "w-12 h-12",
+  lg: "w-20 h-20",
+  xl: "w-32 h-32",
+};
+
+const colorClasses = {
+  orange: "bg-gradient-to-br from-amber-400 via-orange-500 to-red-600",
+  teal: "bg-gradient-to-br from-cyan-400 via-teal-500 to-emerald-600",
+  purple: "bg-gradient-to-br from-violet-400 via-purple-500 to-indigo-600",
+  blue: "bg-gradient-to-br from-sky-400 via-blue-500 to-indigo-600",
+};
+
+const glowClasses = {
+  orange: "drop-shadow-[0_0_15px_rgba(251,146,60,0.6)]",
+  teal: "drop-shadow-[0_0_15px_rgba(45,212,191,0.6)]",
+  purple: "drop-shadow-[0_0_15px_rgba(167,139,250,0.6)]",
+  blue: "drop-shadow-[0_0_15px_rgba(96,165,250,0.6)]",
+};
+
+export function Planet({ 
+  size = "md", 
+  color = "orange", 
+  className,
+  hasRings = false,
+  animated = false 
+}: PlanetProps) {
+  return (
+    <div className={cn("relative", animated && "animate-float", className)}>
+      <div
+        className={cn(
+          "rounded-full relative overflow-hidden",
+          sizeClasses[size],
+          colorClasses[color],
+          glowClasses[color]
+        )}
+      >
+        {/* Surface detail */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
+        <div className="absolute top-1/4 left-1/4 w-1/4 h-1/4 bg-white/10 rounded-full blur-sm" />
+      </div>
+      
+      {hasRings && (
+        <div 
+          className={cn(
+            "absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 border border-foreground/20 rounded-full",
+            size === "sm" && "w-14 h-4",
+            size === "md" && "w-20 h-6",
+            size === "lg" && "w-32 h-10",
+            size === "xl" && "w-52 h-16"
+          )}
+          style={{ transform: "translate(-50%, -50%) rotateX(70deg)" }}
+        />
+      )}
+    </div>
+  );
+}
+import { Star } from "./Star";
+import { Planet } from "./Planet";
+
+interface SolarSystemProps {
+  starType?: "yellow" | "blue" | "orange";
+}
+
+export function SolarSystem({ starType = "yellow" }: SolarSystemProps) {
+  return (
+    <div className="relative w-full h-80 flex items-center justify-center">
+      {/* Orbit rings */}
+      <div className="absolute w-40 h-40 orbit-ring" />
+      <div className="absolute w-64 h-64 orbit-ring" />
+      <div className="absolute w-80 h-80 orbit-ring" />
+      
+      {/* Central Star */}
+      <Star type={starType} size="md" />
+      
+      {/* Orbiting planets */}
+      <div 
+        className="absolute animate-orbit" 
+        style={{ "--orbit-radius": "80px", "--orbit-duration": "12s" } as React.CSSProperties}
+      >
+        <Planet size="sm" color="teal" />
+      </div>
+      
+      <div 
+        className="absolute animate-orbit" 
+        style={{ "--orbit-radius": "128px", "--orbit-duration": "20s" } as React.CSSProperties}
+      >
+        <Planet size="md" color="orange" />
+      </div>
+      
+      <div 
+        className="absolute animate-orbit" 
+        style={{ "--orbit-radius": "160px", "--orbit-duration": "30s" } as React.CSSProperties}
+      >
+        <Planet size="sm" color="purple" hasRings />
+      </div>
+    </div>
+  );
+}
+import { cn } from "@/lib/utils";
+
+interface StarProps {
+  size?: "sm" | "md" | "lg";
+  type?: "yellow" | "blue" | "orange";
+  className?: string;
+}
+
+const sizeClasses = {
+  sm: "w-16 h-16",
+  md: "w-24 h-24",
+  lg: "w-32 h-32",
+};
+
+const colorClasses = {
+  yellow: "bg-gradient-to-br from-yellow-200 via-yellow-400 to-orange-500",
+  blue: "bg-gradient-to-br from-blue-200 via-blue-400 to-cyan-500",
+  orange: "bg-gradient-to-br from-orange-300 via-orange-500 to-red-600",
+};
+
+const glowClasses = {
+  yellow: "drop-shadow-[0_0_30px_rgba(250,204,21,0.8)] drop-shadow-[0_0_60px_rgba(250,204,21,0.4)]",
+  blue: "drop-shadow-[0_0_30px_rgba(147,197,253,0.8)] drop-shadow-[0_0_60px_rgba(147,197,253,0.4)]",
+  orange: "drop-shadow-[0_0_30px_rgba(251,146,60,0.8)] drop-shadow-[0_0_60px_rgba(251,146,60,0.4)]",
+};
+
+export function Star({ size = "md", type = "yellow", className }: StarProps) {
+  return (
+    <div
+      className={cn(
+        "rounded-full star-glow relative",
+        sizeClasses[size],
+        colorClasses[type],
+        glowClasses[type],
+        className
+      )}
+    >
+      {/* Corona effect */}
+      <div className="absolute inset-0 rounded-full bg-gradient-to-t from-transparent via-white/10 to-white/30" />
+    </div>
+  );
+}
+import { useState } from "react";
+import { Navigation } from "@/components/Navigation";
+import { GlassCard } from "@/components/GlassCard";
+import { Star } from "@/components/Star";
+import { Slider } from "@/components/ui/slider";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import { Sparkles } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+
+const starTypes = [
+  { type: "yellow" as const, label: "M Class", desc: "Main Sequence" },
+  { type: "blue" as const, label: "B Class", desc: "Blue Giant" },
+  { type: "orange" as const, label: "O Class", desc: "Red Dwarf" },
+];
+
+const CreateUniverse = () => {
+  const [selectedStar, setSelectedStar] = useState<"yellow" | "blue" | "orange">("yellow");
+  const [climate, setClimate] = useState([50]);
+  const [habitability, setHabitability] = useState([70]);
+  const [resources, setResources] = useState([40]);
+  const { toast } = useToast();
+
+  const handleCreate = () => {
+    toast({
+      title: "Universe Created!",
+      description: `A new ${starTypes.find(s => s.type === selectedStar)?.label} system is forming...`,
+    });
+  };
+
+  return (
+    <div className="min-h-screen gradient-space pb-24">
+      {/* Header */}
+      <header className="px-6 pt-8 pb-4">
+        <h1 className="text-2xl font-display font-bold glow-text-primary">
+          Create Universe
+        </h1>
+        <p className="text-muted-foreground text-sm mt-1">Choose your central star</p>
+      </header>
+
+      {/* Star Preview */}
+      <section className="px-4 animate-fade-up">
+        <GlassCard className="flex items-center justify-center py-12">
+          <Star type={selectedStar} size="lg" />
+        </GlassCard>
+      </section>
+
+      {/* Star Type Selection */}
+      <section className="px-4 mt-6 animate-fade-up" style={{ animationDelay: "0.1s" }}>
+        <h2 className="text-lg font-display font-semibold mb-3">Star Type</h2>
+        <div className="grid grid-cols-3 gap-3">
+          {starTypes.map(({ type, label, desc }) => (
+            <button
+              key={type}
+              onClick={() => setSelectedStar(type)}
+              className={cn(
+                "glass rounded-xl p-4 text-center transition-all duration-300",
+                selectedStar === type 
+                  ? "ring-2 ring-primary glow-primary" 
+                  : "hover:bg-secondary/50"
+              )}
+            >
+              <Star type={type} size="sm" className="mx-auto mb-2" />
+              <p className="font-display font-semibold text-sm">{label}</p>
+              <p className="text-xs text-muted-foreground">{desc}</p>
+            </button>
+          ))}
+        </div>
+      </section>
+
+      {/* Sliders */}
+      <section className="px-4 mt-6 space-y-5 animate-fade-up" style={{ animationDelay: "0.2s" }}>
+        <GlassCard>
+          <div className="flex justify-between items-center mb-3">
+            <span className="text-sm font-medium">Climate Stability</span>
+            <span className="text-sm font-display text-primary">{climate[0]}%</span>
+          </div>
+          <Slider
+            value={climate}
+            onValueChange={setClimate}
+            max={100}
+            step={1}
+            variant="glow"
+          />
+        </GlassCard>
+
+        <GlassCard>
+          <div className="flex justify-between items-center mb-3">
+            <span className="text-sm font-medium">Base Habitability</span>
+            <span className="text-sm font-display text-primary">{habitability[0]}%</span>
+          </div>
+          <Slider
+            value={habitability}
+            onValueChange={setHabitability}
+            max={100}
+            step={1}
+            variant="glow"
+          />
+        </GlassCard>
+import { useState } from "react";
+import { Navigation } from "@/components/Navigation";
+import { GlassCard } from "@/components/GlassCard";
+import { Planet } from "@/components/Planet";
+import { Slider } from "@/components/ui/slider";
+import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
+import { cn } from "@/lib/utils";
+import { Zap, Droplets, Thermometer, Mountain } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+
+const planetColors = [
+  { color: "orange" as const, label: "Rocky" },
+  { color: "teal" as const, label: "Oceanic" },
+  { color: "purple" as const, label: "Gas Giant" },
+  { color: "blue" as const, label: "Ice World" },
+];
+
+const DesignPlanet = () => {
+  const [selectedColor, setSelectedColor] = useState<"orange" | "teal" | "purple" | "blue">("orange");
+  const [temperature, setTemperature] = useState([50]);
+  const [water, setWater] = useState([30]);
+  const [terrain, setTerrain] = useState([60]);
+  const [energy, setEnergy] = useState(42);
+  const { toast } = useToast();
+
+  const evolutionLogs = [
+    "Single-cell organisms detected...",
+    "Photosynthesis emerging on surface",
+    "Complex life forms evolving",
+  ];
+
+  const handleDesign = () => {
+    toast({
+      title: "Planet Designed!",
+      description: "Your custom world is taking shape...",
+    });
+  };
+
+  return (
+    <div className="min-h-screen gradient-space pb-24">
+      {/* Header */}
+      <header className="px-6 pt-8 pb-4">
+        <h1 className="text-2xl font-display font-bold glow-text-primary">
+          Design Planet
+        </h1>
+        <p className="text-muted-foreground text-sm mt-1">Craft your world</p>
+      </header>
+
+      {/* Planet Preview */}
+      <section className="px-4 animate-fade-up">
+        <GlassCard className="flex items-center justify-center py-8">
+          <Planet size="xl" color={selectedColor} animated />
+        </GlassCard>
+      </section>
+
+      {/* Planet Type Selection */}
+      <section className="px-4 mt-6 animate-fade-up" style={{ animationDelay: "0.1s" }}>
+        <h2 className="text-sm font-medium mb-3 text-muted-foreground">Planet Type</h2>
+        <div className="flex gap-3 justify-center">
+          {planetColors.map(({ color, label }) => (
+            <button
+              key={color}
+              onClick={() => setSelectedColor(color)}
+              className={cn(
+                "flex flex-col items-center gap-2 p-3 rounded-xl transition-all duration-300",
+                selectedColor === color 
+                  ? "glass ring-2 ring-primary" 
+                  : "hover:bg-secondary/30"
+              )}
+            >
+              <Planet size="sm" color={color} />
+              <span className="text-xs">{label}</span>
+            </button>
+          ))}
+        </div>
+      </section>
+
+      {/* Environmental Sliders */}
+      <section className="px-4 mt-6 space-y-4 animate-fade-up" style={{ animationDelay: "0.2s" }}>
+        <GlassCard>
+          <div className="flex items-center gap-3 mb-3">
+            <Thermometer className="w-4 h-4 text-destructive" />
+            <span className="text-sm font-medium flex-1">Temperature</span>
+            <span className="text-sm font-display text-primary">{temperature[0]}°C</span>
+          </div>
+          <Slider
+            value={temperature}
+            onValueChange={setTemperature}
+            min={-100}
+            max={200}
+            step={1}
+            variant="glow"
+          />
+        </GlassCard>
+
+        <GlassCard>
+          <div className="flex items-center gap-3 mb-3">
+            <Droplets className="w-4 h-4 text-planet-blue" />
+            <span className="text-sm font-medium flex-1">Water Coverage</span>
+            <span className="text-sm font-display text-primary">{water[0]}%</span>
+          </div>
+          <Slider
+            value={water}
+            onValueChange={setWater}
+            max={100}
+            step={1}
+            variant="glow"
+          />
+        </GlassCard>
+
+        <GlassCard>
+          <div className="flex items-center gap-3 mb-3">
+            <Mountain className="w-4 h-4 text-muted-foreground" />
+            <span className="text-sm font-medium flex-1">Terrain Roughness</span>
+            <span className="text-sm font-display text-primary">{terrain[0]}%</span>
+          </div>
+          <Slider
+            value={terrain}
+            onValueChange={setTerrain}
+            max={100}
+            step={1}
+            variant="glow"
+          />
+        </GlassCard>
+      </section>
+
+      {/* Energy Progress */}
+      <section className="px-4 mt-6 animate-fade-up" style={{ animationDelay: "0.25s" }}>
+        <GlassCard>
+          <div className="flex items-center gap-3 mb-3">
+            <Zap className="w-4 h-4 text-accent" />
+            <span className="text-sm font-medium flex-1">Evolution Energy</span>
+            <span className="text-sm font-display text-accent">{energy}%</span>
+          </div>
+          <Progress value={energy} className="h-2" />
+        </GlassCard>
+      </section>
+
+      {/* Evolution Log */}
+      <section className="px-4 mt-6 animate-fade-up" style={{ animationDelay: "0.3s" }}>
+        <GlassCard>
+          <h3 className="text-sm font-medium mb-3 text-muted-foreground">Evolution Log</h3>
+          <div className="space-y-2">
+            {evolutionLogs.map((log, i) => (
+              <p key={i} className="text-xs text-primary/80 font-mono">
+                &gt; {log}
+              </p>
+            ))}
+          </div>
+        </GlassCard>
+      </section>
+
+      {/* Save Button */}
+      <section className="px-4 mt-6 animate-fade-up" style={{ animationDelay: "0.35s" }}>
+        <Button 
+          onClick={handleDesign}
+          className="w-full py-6 text-lg font-display font-semibold glow-primary"
+        >
+          Save Planet Design
+        </Button>
+      </section>
+
+      <Navigation />
+    </div>
+  );
+};
+
+export default DesignPlanet;
+import { Navigation } from "@/components/Navigation";
+import { GlassCard } from "@/components/GlassCard";
+import { cn } from "@/lib/utils";
+import { Dna, Flame, Droplets, Leaf, Bug, Fish, Bird, Cat } from "lucide-react";
+
+const historyEvents = [
+  {
+    icon: Flame,
+    title: "Planet Formation",
+    description: "Molten surface begins to cool and solidify",
+    time: "4.5B years ago",
+    color: "text-destructive",
+  },
+  {
+    icon: Droplets,
+    title: "First Oceans",
+    description: "Water vapor condenses into vast oceans",
+    time: "4.2B years ago",
+    color: "text-planet-blue",
+  },
+  {
+    icon: Dna,
+    title: "Single-Cell Life",
+    description: "First prokaryotic organisms emerge",
+    time: "3.8B years ago",
+    color: "text-primary",
+  },
+  {
+    icon: Leaf,
+    title: "Photosynthesis",
+    description: "Oxygen production begins globally",
+    time: "2.4B years ago",
+    color: "text-planet-teal",
+  },
+  {
+    icon: Bug,
+    title: "Multi-Cell Life",
+    description: "Complex organisms start to evolve",
+    time: "600M years ago",
+    color: "text-planet-purple",
+  },
+  {
+    icon: Fish,
+    title: "Marine Explosion",
+    description: "Diverse sea life fills the oceans",
+    time: "500M years ago",
+    color: "text-planet-blue",
+  },
+  {
+    icon: Bird,
+    title: "Land Colonization",
+    description: "Life moves onto continental surfaces",
+    time: "400M years ago",
+    color: "text-accent",
+  },
+  {
+    icon: Cat,
+    title: "Intelligent Species",
+    description: "Sentient beings develop civilization",
+    time: "2M years ago",
+    color: "text-primary",
+  },
+];
+
+const HistoryLog = () => {
+  return (
+    <div className="min-h-screen gradient-space pb-24">
+      {/* Header */}
+      <header className="px-6 pt-8 pb-4">
+        <h1 className="text-2xl font-display font-bold glow-text-primary">
+          History Log
+        </h1>
+        <p className="text-muted-foreground text-sm mt-1">Evolution timeline</p>
+      </header>
+
+      {/* Timeline */}
+      <section className="px-4 mt-2">
+        <div className="relative">
+          {/* Timeline line */}
+          <div className="absolute left-6 top-0 bottom-0 w-px bg-gradient-to-b from-primary via-accent to-primary/20" />
+
+          {/* Events */}
+          <div className="space-y-4">
+            {historyEvents.map((event, index) => {
+              const Icon = event.icon;
+              return (
+                <div 
+                  key={event.title} 
+                  className="relative pl-14 animate-fade-up"
+                  style={{ animationDelay: `${index * 0.05}s` }}
+                >
+                  {/* Icon circle */}
+                  <div className={cn(
+                    "absolute left-3 w-6 h-6 rounded-full glass flex items-center justify-center",
+                    "ring-2 ring-border"
+                  )}>
+                    <Icon className={cn("w-3 h-3", event.color)} />
+                  </div>
+
+                  {/* Content card */}
+                  <GlassCard className="relative">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex-1">
+                        <h3 className="font-medium text-sm">{event.title}</h3>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          {event.description}
+                        </p>
+                      </div>
+                      <span className="text-xs font-display text-primary whitespace-nowrap">
+                        {event.time}
+                      </span>
+                    </div>
+                  </GlassCard>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* Summary */}
+      <section className="px-4 mt-8 animate-fade-up" style={{ animationDelay: "0.5s" }}>
+        <GlassCard className="text-center">
+          <p className="text-2xl font-display font-bold text-primary mb-1">4.5 Billion</p>
+          <p className="text-sm text-muted-foreground">Years of Evolution</p>
+        </GlassCard>
+      </section>
+
+      <Navigation />
+    </div>
+  );
+};
+
+export default HistoryLog;
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Pocket Universe - Your Cosmic Sandbox</title>
+    <meta name="description" content="Create and manage your own mini solar systems with glowing planets, customize climates, and watch evolution unfold in your pocket universe." />
+    <meta name="author" content="Pocket Universe" />
+    <meta name="theme-color" content="#0a1628" />
+
+    <meta property="og:title" content="Pocket Universe - Your Cosmic Sandbox" />
+    <meta property="og:description" content="Create and manage your own mini solar systems with glowing planets, customize climates, and watch evolution unfold." />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@PocketUniverse" />
+    <meta name="twitter:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
+  </head>
+
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
+import { Toaster } from "@/components/ui/toaster";
+import { Toaster as Sonner } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Index from "./pages/Index";
+import CreateUniverse from "./pages/CreateUniverse";
+import DesignPlanet from "./pages/DesignPlanet";
+import HistoryLog from "./pages/HistoryLog";
+import NotFound from "./pages/NotFound";
+
+const queryClient = new QueryClient();
+
+const App = () => (
+  <QueryClientProvider client={queryClient}>
+    <TooltipProvider>
+      <Toaster />
+      <Sonner />
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Index />} />
+          <Route path="/create" element={<CreateUniverse />} />
+          <Route path="/design" element={<DesignPlanet />} />
+          <Route path="/history" element={<HistoryLog />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </BrowserRouter>
+    </TooltipProvider>
+  </QueryClientProvider>
+);
+
+export default App;
+import * as React from "react";
+import * as SliderPrimitive from "@radix-ui/react-slider";
+
+import { cn } from "@/lib/utils";
+
+interface SliderProps extends React.ComponentPropsWithoutRef<typeof SliderPrimitive.Root> {
+  variant?: "default" | "glow";
+}
+
+const Slider = React.forwardRef<
+  React.ElementRef<typeof SliderPrimitive.Root>,
+  SliderProps
+>(({ className, variant = "default", ...props }, ref) => (
+  <SliderPrimitive.Root
+    ref={ref}
+    className={cn("relative flex w-full touch-none select-none items-center", className)}
+    {...props}
+  >
+    <SliderPrimitive.Track className="relative h-2 w-full grow overflow-hidden rounded-full bg-secondary">
+      <SliderPrimitive.Range 
+        className={cn(
+          "absolute h-full",
+          variant === "glow" 
+            ? "slider-glow" 
+            : "bg-primary"
+        )} 
+      />
+    </SliderPrimitive.Track>
+    <SliderPrimitive.Thumb 
+      className={cn(
+        "block h-5 w-5 rounded-full border-2 border-primary bg-background ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
+        variant === "glow" && "glow-primary"
+      )} 
+    />
+  </SliderPrimitive.Root>
+));
+Slider.displayName = SliderPrimitive.Root.displayName;
+
+export { Slider };
+import { SolarSystem } from "@/components/SolarSystem";
+import { GlassCard } from "@/components/GlassCard";
+import { Navigation } from "@/components/Navigation";
+import { Planet } from "@/components/Planet";
+import { Sparkles, Zap, Globe } from "lucide-react";
+
+const Index = () => {
+  return (
+    <div className="min-h-screen gradient-space pb-24">
+      {/* Header */}
+      <header className="px-6 pt-8 pb-4">
+        <h1 className="text-2xl font-display font-bold glow-text-primary">
+          Pocket Universe
+        </h1>
+        <p className="text-muted-foreground text-sm mt-1">Your cosmic sandbox</p>
+      </header>
+
+      {/* Solar System View */}
+      <section className="px-4 animate-fade-up">
+        <GlassCard className="overflow-hidden">
+          <SolarSystem starType="yellow" />
+        </GlassCard>
+      </section>
+
+      {/* Stats Cards */}
+      <section className="px-4 mt-6 grid grid-cols-3 gap-3 animate-fade-up" style={{ animationDelay: "0.1s" }}>
+        <GlassCard className="text-center">
+          <Sparkles className="w-5 h-5 text-primary mx-auto mb-2" />
+          <p className="text-xl font-display font-bold">3</p>
+          <p className="text-xs text-muted-foreground">Planets</p>
+        </GlassCard>
+        
+        <GlassCard className="text-center">
+          <Zap className="w-5 h-5 text-accent mx-auto mb-2" />
+          <p className="text-xl font-display font-bold">2.4B</p>
+          <p className="text-xs text-muted-foreground">Years</p>
+        </GlassCard>
+        
+        <GlassCard className="text-center">
+          <Globe className="w-5 h-5 text-planet-teal mx-auto mb-2" />
+          <p className="text-xl font-display font-bold">87%</p>
+          <p className="text-xs text-muted-foreground">Habitable</p>
+        </GlassCard>
+      </section>
+
+      {/* Recent Planets */}
+      <section className="px-4 mt-6 animate-fade-up" style={{ animationDelay: "0.2s" }}>
+        <h2 className="text-lg font-display font-semibold mb-3">Recent Planets</h2>
+        <div className="space-y-3">
+          {[
+            { name: "Terra Nova", color: "teal" as const, type: "Earth-like", habitability: 92 },
+            { name: "Pyralis", color: "orange" as const, type: "Volcanic", habitability: 24 },
+            { name: "Crystalia", color: "purple" as const, type: "Ice Giant", habitability: 45 },
+          ].map((planet, i) => (
+            <GlassCard key={planet.name} className="flex items-center gap-4">
+              <Planet size="md" color={planet.color} />
+              <div className="flex-1">
+                <h3 className="font-medium">{planet.name}</h3>
+                <p className="text-sm text-muted-foreground">{planet.type}</p>
+              </div>
+              <div className="text-right">
+                <p className="text-lg font-display font-bold text-primary">{planet.habitability}%</p>
+                <p className="text-xs text-muted-foreground">Habitable</p>
+              </div>
+            </GlassCard>
+          ))}
+        </div>
+      </section>
+
+      <Navigation />
+    </div>
+  );
+};
+
+export default Index;
+import type { Config } from "tailwindcss";
+
+export default {
+  darkMode: ["class"],
+  content: ["./pages/**/*.{ts,tsx}", "./components/**/*.{ts,tsx}", "./app/**/*.{ts,tsx}", "./src/**/*.{ts,tsx}"],
+  prefix: "",
+  theme: {
+    container: {
+      center: true,
+      padding: "2rem",
+      screens: {
+        "2xl": "1400px",
+      },
+    },
+    extend: {
+      fontFamily: {
+        sans: ["Inter", "system-ui", "sans-serif"],
+        display: ["Orbitron", "system-ui", "sans-serif"],
+      },
+      colors: {
+        border: "hsl(var(--border))",
+        input: "hsl(var(--input))",
+        ring: "hsl(var(--ring))",
+        background: "hsl(var(--background))",
+        foreground: "hsl(var(--foreground))",
+        primary: {
+          DEFAULT: "hsl(var(--primary))",
+          foreground: "hsl(var(--primary-foreground))",
+        },
+        secondary: {
+          DEFAULT: "hsl(var(--secondary))",
+          foreground: "hsl(var(--secondary-foreground))",
+        },
+        destructive: {
+          DEFAULT: "hsl(var(--destructive))",
+          foreground: "hsl(var(--destructive-foreground))",
+        },
+        muted: {
+          DEFAULT: "hsl(var(--muted))",
+          foreground: "hsl(var(--muted-foreground))",
+        },
+        accent: {
+          DEFAULT: "hsl(var(--accent))",
+          foreground: "hsl(var(--accent-foreground))",
+        },
+        popover: {
+          DEFAULT: "hsl(var(--popover))",
+          foreground: "hsl(var(--popover-foreground))",
+        },
+        card: {
+          DEFAULT: "hsl(var(--card))",
+          foreground: "hsl(var(--card-foreground))",
+        },
+        space: {
+          dark: "hsl(var(--space-dark))",
+          medium: "hsl(var(--space-medium))",
+          light: "hsl(var(--space-light))",
+        },
+        planet: {
+          orange: "hsl(var(--planet-orange))",
+          teal: "hsl(var(--planet-teal))",
+          purple: "hsl(var(--planet-purple))",
+          blue: "hsl(var(--planet-blue))",
+        },
+        star: {
+          yellow: "hsl(var(--star-yellow))",
+          blue: "hsl(var(--star-blue))",
+          orange: "hsl(var(--star-orange))",
+        },
+        glow: {
+          primary: "hsl(var(--glow-primary))",
+          accent: "hsl(var(--glow-accent))",
+          purple: "hsl(var(--glow-purple))",
+        },
+        sidebar: {
+          DEFAULT: "hsl(var(--sidebar-background))",
+          foreground: "hsl(var(--sidebar-foreground))",
+          primary: "hsl(var(--sidebar-primary))",
+          "primary-foreground": "hsl(var(--sidebar-primary-foreground))",
+          accent: "hsl(var(--sidebar-accent))",
+          "accent-foreground": "hsl(var(--sidebar-accent-foreground))",
+          border: "hsl(var(--sidebar-border))",
+          ring: "hsl(var(--sidebar-ring))",
+        },
+      },
+      borderRadius: {
+        lg: "var(--radius)",
+        md: "calc(var(--radius) - 2px)",
+        sm: "calc(var(--radius) - 4px)",
+      },
+      keyframes: {
+        "accordion-down": {
+from: { height: "0" },
+          to: { height: "var(--radix-accordion-content-height)" },
+        },
+        "accordion-up": {
+from: { height: "var(--radix-accordion-content-height)" },
+          to: { height: "0" },
+        },
+      },
+      animation: {
+        "accordion-down": "accordion-down 0.2s ease-out",
+        "accordion-up": "accordion-up 0.2s ease-out",
+      },
+    },
+  },
+  plugins: [require("tailwindcss-animate")],
+} satisfies Config;
